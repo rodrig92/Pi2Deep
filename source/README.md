@@ -17,5 +17,5 @@ $:sudo cp src/include/libjpcnn.h /usr/include/
 
 $:make GEMM=eigen TARGET=pi2
 
-$:./jpcnn -i data/dog.jpg -n networks/jetpac.ntwk -t -m s -d
+$:./jpcnn -i data/dog.jpg -n ../networks/jetpac.ntwk -t -m s -d
 
