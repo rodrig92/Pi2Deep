@@ -9,6 +9,9 @@ LIBCPPFLAGS=-Ofast -I ./src/lib/include -I ./src/lib/graph -I ./src/lib/math -I 
 LIBLDFLAG=
 LIBLDLIBS=
 
+GEMM=eigen
+TARGET=pi2
+
 $(warning GEMM=$(GEMM))
 $(warning TARGET=$(TARGET))
 
