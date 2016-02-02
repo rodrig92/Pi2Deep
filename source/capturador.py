@@ -13,28 +13,38 @@ import picamera
 import time
 import sys
 from subprocess import call
+import RPi.GPIO as GPIO                                                    #import RPi.GPIO module  
 
-camera = picamera.PiCamera()
-time.sleep(7)                                                  #Retardo para poder sacar la foto
+GPIO.setmode(GPIO.BCM)                                                     #seleccionamos BCM o BOARD  
+GPIO.setup(17, GPIO.IN)                                                    #establecemos el pin GPIO17 como input   
+   
+try:
+        camera = picamera.PiCamera()
+        if len(sys.argv) == 2:
+                camera.resolution = (int(sys.argv[1]), int(sys.argv[1]))   #caso de pasarle un tamanio por argumento
+        elif len(sys.argv) == 3:
+                camera.resolution = (int(sys.argv[1]), int(sys.argv[2]))   #caso de pasarle los tamanios por argumento
+        else:
+                camera.resolution = (600, 600)                             #tamanio por defecto de la imagen
+  
+        while True:                                                        #bucle para la espera de pulsar el boton 
+                if (GPIO.input(17) == 1):
+                        print "captura"
+                        name = str(camera.resolution)
+                        name = str('img'+name+'.jpg')                      #asignacion del nombre de la imagen
 
-if len(sys.argv) == 2:
-    camera.resolution = (int(sys.argv[1]), int(sys.argv[1]))   #caso de pasarle un tamaño por argumento
-elif len(sys.argv) == 3:
-   camera.resolution = (int(sys.argv[1]), int(sys.argv[2]))    #caso de pasarle los tamaños por argumento
-else:
-   camera.resolution = (600, 600)                              #tamaño por defecto de la imagen
+                        camera.capture(name)                               #captura
 
-name = str(camera.resolution)
-name = str('img'+name+'.jpg')                                  #asignacion del nombre de la imagen
+                        time.sleep(2)                                      #Tiempo para que saque la foto
 
-camera.capture(name)                                           #captura
+                        ejecutar = ['./jpcnn','-i',name,'-n','../networks/jetpac.ntwk','-t','-m','s','-d']     #lista de parametros para la ejecucion del reconocimiento
 
-time.sleep(2)                                                  #Tiempo para que saque la foto
+                        call(ejecutar)                                     #ejecucion del reconocimiento
 
-ejecutar = ['./jpcnn','-i',name,'-n','../networks/jetpac.ntwk','-t','-m','s','-d']     #lista de parametros para la ejecución del reconocimiento
-
-call(ejecutar)                                                 #ejecución del reconocimiento
-
-time.sleep(2)                                                  #retardo final
+                        time.sleep(2)                                      #retardo final
  
-call(['rm', name])                                             #borramos la foto resultado   
+                        call(['rm', name])                                 #borramos la foto resultado   
+
+except KeyboardInterrupt:                                                  #CTRL+C para interrumpir  
+        GPIO.cleanup()                                                     #reset de los puertos GPIO usados  
+        print "Cerrado correctamente"
