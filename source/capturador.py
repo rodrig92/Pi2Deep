@@ -15,9 +15,9 @@ import sys
 from subprocess import call
 import RPi.GPIO as GPIO                                                                    #import RPi.GPIO module  
 
-GPIO.setmode(GPIO.BCM)                                                                     #choose BCM or BOARD  
-GPIO.setup(23, GPIO.IN)                                                                    #set GPIO23 as an input   
-GPIO.setup(18, GPIO.IN)                                                                    #set GPIO18 as an input 
+GPIO.setmode (GPIO.BCM)                                                                     #choose BCM or BOARD  
+GPIO.setup (23, GPIO.IN, GPIO.PUD_UP)                                                       #set GPIO23 as an input   
+GPIO.setup (18, GPIO.IN, GPIO.PUD_UP)                                                       #set GPIO18 as an input 
 
 def envia_foto (foto):
     if len (foto) > 0:
@@ -27,7 +27,7 @@ def envia_foto (foto):
         print "No hay foto"
 
 def capturar ():
-    camera = picamera.PiCamera()
+    camera = picamera.PiCamera ()
     camera.resolution = (320, 240)                                     #tamanio por defecto de la imagen
     name = str (camera.resolution)
     name = str ('img'+name+'.jpg')                                      #asignacion del nombre de la imagen
