@@ -30,49 +30,50 @@ def capturar ():
     camera = picamera.PiCamera ()
     camera.resolution = (320, 240)                                     #tamanio por defecto de la imagen
     name = str (camera.resolution)
-    name = str ('img'+name+'.jpg')                                      #asignacion del nombre de la imagen
+    name = str ('/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/img'+name+'.jpg')                                      #asignacion del nombre de la imagen
     camera.capture (name)                                               #captura
     envia_foto (name)
     camera.close () 
     return name
    
 def resultado (fichero):
-    ejecutar = ['sort','-n','-k2','-r',fichero,'-o','log2.txt']              #ordenamos el resultado para que salga la mayor probabilidad primero
+    ejecutar = ['sort','-n','-k2','-r',fichero,'-o','/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/log2.txt']              #ordenamos el resultado para que salga la mayor probabilidad primero
     call (ejecutar)
-    res = open ('log2.txt', 'r')                                        #abrimos fichero resultado
+    res = open ('/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/log2.txt', 'r')                                        #abrimos fichero resultado
     linea = res.readline ()                                             #leemos la primera linea
     linea = linea.split ()                                              #separamos la linea en una lista de palabras
     if float (linea[0]) > 0.05:
        res = "Resultado:" + str (linea[1])
        envia_foto (res)                                           #enviamos el resultado a la pantalla
-       time.sleep (1.5)
+       time.sleep (2.5)
     else:
        envia_foto ("imposible reconocer")
 
 def reconoce (foto):
     if len (foto) > 0:
-        ejecutar = ['./jpcnn','-i',foto,'-n','../networks/jetpac.ntwk','-t','-m','s','-d']
-        outfile = open ('log.txt', 'w')
+        ejecutar = ['/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/jpcnn','-i',foto,'-n','/home/pi/rodrigo_proyecto/2016/Pi2Deep/networks/jetpac.ntwk','-t','-m','s','-d']
+        outfile = open ('/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/log.txt', 'w')
         errfile = open ('/dev/null', 'w')
         call (ejecutar,stdout = outfile,stderr = errfile)                       #ejecucion del reconocimiento
         outfile.close ()
         errfile.close ()
-        resultado ('log.txt')
+        resultado ('/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/log.txt')
     else:
         print "error en reconocimiento"
        
 def salir (foto):
     envia_foto ("Fin del programa")
-    ejecutar = ['rm','-r',foto,'log.txt','log2.txt']
+    ejecutar = ['rm','-r',foto,'/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/log.txt','/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/log2.txt']
     call (ejecutar)
     GPIO.cleanup ()                                                     #reset de los puertos GPIO usados  
     print "Bye bye"
+#    call ('poweroff')
 
-fotos = {1: 'f_menu/Capturar.jpg',
-         2: 'f_menu/Previsualizar.jpg',
-         3: 'f_menu/Reconocer.jpg',
-         0: 'f_menu/Salir.jpg',
-         10: 'img(320, 240).jpg'  
+fotos = {1: '/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/f_menu/Capturar.jpg',
+         2: '/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/f_menu/Previsualizar.jpg',
+         3: '/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/f_menu/Reconocer.jpg',
+         0: '/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/f_menu/Salir.jpg',
+         10: '/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/img(320, 240).jpg'  
        }
 
 def op1 ():
@@ -82,8 +83,9 @@ def op2 ():
     envia_foto (fotos[10])
     time.sleep (4)
 def op3 ():
-    reconoce (fotos[10])
-    time.sleep (1)
+    re = '/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/img(320, 240).jpg'
+    reconoce (re)
+    envia_foto (fotos[10])
 def op0 ():
     salir (fotos[10])
     exit (0)
@@ -102,12 +104,12 @@ try:
         if (GPIO.input (23) == 0):                   #boton de desplazamiento de menu
             contador_menu = int ((contador_menu + 1) % 4)
             envia_foto (fotos[contador_menu])
-            time.sleep (0.5)
+            time.sleep (0.3)
         if (GPIO.input (18) == 0):                   #boton de accion
             opcion_menu[contador_menu] ()
             contador_menu = 1
             envia_foto (fotos[contador_menu]) 
-            time.sleep (0.5)
+            time.sleep (0.3)
            
 except KeyboardInterrupt:
     salir (fotos[10])
