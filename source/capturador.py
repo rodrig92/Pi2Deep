@@ -67,7 +67,6 @@ def salir (foto):
     call (ejecutar)
     GPIO.cleanup ()                                                     #reset de los puertos GPIO usados  
     print "Bye bye"
-#    call ('poweroff')
 
 fotos = {1: '/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/f_menu/Capturar.jpg',
          2: '/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/f_menu/Previsualizar.jpg',
@@ -88,6 +87,7 @@ def op3 ():
     envia_foto (fotos[10])
 def op0 ():
     salir (fotos[10])
+    call ('poweroff')      #Apagamos la maquina
     exit (0)
     
 opcion_menu = {1: op1,
@@ -97,6 +97,7 @@ opcion_menu = {1: op1,
               }
     
 contador_menu = 1
+call ('/home/pi/rodrigo_proyecto/2016/Pi2Deep/source/tft-start')     #inicializamos el modulo de la pantalla
 envia_foto (fotos[1])
 
 try:
